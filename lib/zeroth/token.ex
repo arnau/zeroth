@@ -1,6 +1,6 @@
 defmodule Zeroth.Token do
   @moduledoc """
-  Provides functions to retrieve a token.
+  Provides functions to handle a token.
   """
 
   alias Zeroth.Api
@@ -16,10 +16,10 @@ defmodule Zeroth.Token do
   @doc """
     Fetches a new token from the API.
 
-    client = Zeroth.Client.new(domain, credentials)
-    fetch(client)
+        client = Zeroth.Client.new(domain, credentials)
+        fetch(client)
   """
-  # @spec fetch(Client.t, String.t) :: Result.t
+  @spec fetch(Api.t, String.t) :: Result.t(any, Token.t)
   def fetch(client, path \\ "oauth/token") do
     body = client.credentials
            |> Map.from_struct()
@@ -28,14 +28,45 @@ defmodule Zeroth.Token do
     client
     |> Api.update_endpoint(path)
     |> Api.post(body)
+    |> Result.map(&decode/1)
   end
 
-  #   data = Poison.decode!(response.body)
-  #   token = Map.get(data, "access_token")
+  @spec decode(map) :: Token.t
+  defp decode(%{"access_token" => token,
+                "scope" => scope,
+                "token_type" => type}) do
+    %__MODULE__{token: token,
+                expiration_time: expires_at(token),
+                scope: String.split(scope),
+                type: type}
+  end
 
-  #   put(:token, token)
-  #   put(:exp, expires_at(token))
+  @doc """
+  Checks if a token is valid based on its expiration time.
 
-  #   token
-  # end
+      iex> alias Zeroth.Token
+      ...> exp = DateTime.to_unix(DateTime.utc_now()) + 86400
+      ...> Token.is_valid(%Token{token: "t", expiration_time: exp})
+      true
+
+      iex> alias Zeroth.Token
+      ...> exp = DateTime.to_unix(DateTime.utc_now()) - 86400
+      ...> Token.is_valid(%Token{token: "t", expiration_time: exp})
+      false
+  """
+  @spec is_valid(Token.t) :: boolean
+  def is_valid(%__MODULE__{expiration_time: exp}) do
+    DateTime.to_unix(DateTime.utc_now()) < exp
+  end
+
+  @doc false
+  @spec expires_at(String.t) :: non_neg_integer
+  def expires_at(token) do
+    token
+    |> String.split(".")
+    |> Enum.at(1)
+    |> Base.url_decode64!(padding: false)
+    |> Poison.decode!()
+    |> Map.get("exp")
+  end
 end

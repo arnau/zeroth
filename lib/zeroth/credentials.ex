@@ -34,21 +34,24 @@ defmodule Zeroth.Credentials do
       ...> Credentials.from_list([client_id: "x",
       ...>                        client_secret: "y",
       ...>                        host: URI.parse("https://foo.auth0.com")])
-      %Zeroth.Credentials{client_id: "x",
-                          client_secret: "y",
-                          grant_type: "client_credentials",
-                          audience: %URI{authority: "foo.auth0.com",
-                                         fragment: nil,
-                                         host: "foo.auth0.com",
-                                         path: "/api/v2/",
-                                         port: 443,
-                                         query: nil,
-                                         scheme: "https",
-                                         userinfo: nil}}
+      {:ok, %Zeroth.Credentials{client_id: "x",
+                                client_secret: "y",
+                                grant_type: "client_credentials",
+                                audience: %URI{authority: "foo.auth0.com",
+                                               fragment: nil,
+                                               host: "foo.auth0.com",
+                                               path: "/api/v2/",
+                                               port: 443,
+                                               query: nil,
+                                               scheme: "https",
+                                               userinfo: nil}}}
   """
+  @spec from_list(list) :: Result.t(String.t, t)
   def from_list(xs) when is_list(xs) do
-    %__MODULE__{client_id: Keyword.get(xs, :client_id),
-                client_secret: Keyword.get(xs, :client_secret),
-                audience: URI.merge(Keyword.get(xs, :host), "/api/v2/")}
+    {:ok, %__MODULE__{client_id: Keyword.get(xs, :client_id),
+                      client_secret: Keyword.get(xs, :client_secret),
+                      audience: URI.merge(Keyword.get(xs, :host), "/api/v2/")}}
+  rescue
+    _ -> {:error, "The host must be an absolute URI: https://example.auth0.com"}
   end
 end

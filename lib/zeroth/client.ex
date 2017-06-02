@@ -1,11 +1,17 @@
 defmodule Zeroth.Client do
   @moduledoc """
   An agent able to interact with the API.
+
+  The fastest way to create a client is to set the environment variables
+  `AUTH0_HOST`, `AUTH0_CLIENT_ID` and `AUTH0_CLIENT_SECRET` and use
+  `Client.from_env/0`. If you prefer composing it yourself, check
+  `Client.from_credentials/1` out.
   """
 
   alias Zeroth.Client
   alias Zeroth.Credentials
   alias Zeroth.Token
+  alias Lonely.Result
 
   @enforce_keys [:endpoint, :credentials]
   defstruct [:endpoint,
@@ -21,36 +27,50 @@ defmodule Zeroth.Client do
 
       iex> alias Zeroth.Client
       ...> alias Zeroth.Credentials
-      ...> creds = Credentials.from_list([client_id: "x",
-      ...>                                client_secret: "y",
-      ...>                                host: URI.parse("https://foo.auth0.com")])
+      ...> {:ok, creds} = Credentials.from_list([client_id: "x",
+      ...>                                       client_secret: "y",
+      ...>                                       host: URI.parse("https://foo.auth0.com")])
       ...> Client.from_credentials(creds)
-      %Zeroth.Client{endpoint: %URI{authority: "foo.auth0.com",
-                                    host: "foo.auth0.com",
-                                    path: "/",
-                                    port: 443,
-                                    scheme: "https"},
-                     credentials: %Zeroth.Credentials{audience: %URI{authority: "foo.auth0.com",
-                                                                     host: "foo.auth0.com",
-                                                                     path: "/api/v2/",
-                                                                     port: 443,
-                                                                     scheme: "https"},
-                                                      client_id: "x",
-                                                      client_secret: "y",
-                                                      grant_type: "client_credentials"}}
+      {:ok, %Zeroth.Client{endpoint: %URI{authority: "foo.auth0.com",
+                                          host: "foo.auth0.com",
+                                          path: "/",
+                                          port: 443,
+                                          scheme: "https"},
+                           credentials: %Zeroth.Credentials{audience: %URI{authority: "foo.auth0.com",
+                                                                           host: "foo.auth0.com",
+                                                                           path: "/api/v2/",
+                                                                           port: 443,
+                                                                           scheme: "https"},
+                                                            client_id: "x",
+                                                            client_secret: "y",
+                                                            grant_type: "client_credentials"}}}
   """
-  @spec from_credentials(Credentials.t) :: t
+  @spec from_credentials(Credentials.t) :: Result.t(String.t, t)
   def from_credentials(credentials) do
-    %Zeroth.Client{endpoint: URI.merge(credentials.audience, "/"),
-                   credentials: credentials}
+    {:ok, %Zeroth.Client{endpoint: URI.merge(credentials.audience, "/"),
+                         credentials: credentials}}
+  rescue
+    _ -> {:error, "The audience must be an absolute URI: https://example.auth0.com"}
   end
 
-  @spec from_env() :: t
+  @doc """
+  Grabs the credentials from the environment and generates a result with a
+  client or an error.
+  """
+  @spec from_env() :: Result.t(String.t, t)
   def from_env do
     :zeroth
     |> Application.get_all_env()
     |> Credentials.from_list()
-    |> Client.from_credentials()
+    |> Result.flat_map(&from_credentials/1)
+  end
+
+  @spec from_list(list) :: Result.t(String.t, t)
+  def from_list([]), do: from_env()
+  def from_list(xs) do
+    xs
+    |> Credentials.from_list()
+    |> Result.flat_map(&from_credentials/1)
   end
 end
 
@@ -67,7 +87,18 @@ defimpl Zeroth.Api, for: Zeroth.Client do
                       %{"Content-Type" => "application/json"}
                       |> Map.merge(headers)
                       |> Map.to_list())
-    |> Result.flat_map(fn response -> Poison.decode(response.body) end)
+    |> Result.flat_map(&parse_response/1)
+  end
+
+  def parse_response(%{status_code: 200, body: body}) do
+    Poison.decode(body)
+  end
+
+  def parse_response(response) do
+    response.body
+    |> Poison.decode(keys: :atoms)
+    |> Result.map(&Map.put(&1, :status_code, response.status_code))
+    |> Result.flat_map(fn reason -> {:error, reason} end)
   end
 
   def update_endpoint(client, path) do

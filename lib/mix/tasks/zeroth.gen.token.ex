@@ -7,6 +7,11 @@ defmodule Mix.Tasks.Zeroth.Gen.Token do
   `AUTH0_HOST`, `AUTH0_CLIENT_ID` and `AUTH0_CLIENT_SECRET`.
 
       mix zeroth.gen.token
+
+  Alternatively you can provide the three bits of information with flags:
+
+      mix zeroth.gen.token --client-id foo --client-secret bar --host https://foo.auth0.com
+
   """
 
   use Mix.Task
@@ -14,14 +19,34 @@ defmodule Mix.Tasks.Zeroth.Gen.Token do
   alias Zeroth.Client
   alias Zeroth.Credentials
   alias Zeroth.Token
+  alias Lonely.Result
 
+  @doc false
   def run(argv) do
-    # {opts, _args, _invalid} =
-    #   OptionParser.parse(argv, [switches: [owner: :string]])
-    HTTPoison.start()
-    client = Client.from_env()
-    token = Token.fetch(client)
+    argv
+    |> OptionParser.parse([strict: [client_id: :string,
+                                    client_secret: :string,
+                                    host: :string]])
+    |> validate_input()
+    |> Result.flat_map(&validate_options/1)
+    |> Result.flat_map(&Client.from_list/1)
+    |> Result.flat_map(&fetch/1)
+    |> Result.map(fn %{token: token} -> Mix.shell.info([:green, token]) end)
+    |> Result.map_error(fn
+      %{error_description: reason} -> Mix.shell.error(reason)
+      error -> Mix.shell.error(inspect(error))
+    end)
+  end
 
-    Mix.shell.info([:green, inspect(token)])
+  def validate_input({opts, _, []}), do: {:ok, opts}
+  def validate_input({_, _, invalid}), do: {:error, inspect(invalid)}
+
+  def validate_options(xs) when length(xs) in [0, 3], do: {:ok, xs}
+  def validate_options(_), do:
+    {:error, "You need to provide no flags or three: --client-id, --client-secret and --host"}
+
+  def fetch(client) do
+    HTTPoison.start()
+    Token.fetch(client)
   end
 end

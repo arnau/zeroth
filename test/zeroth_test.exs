@@ -3,4 +3,5 @@ defmodule ZerothTest do
   doctest Zeroth
   doctest Zeroth.Client
   doctest Zeroth.Credentials
+  doctest Zeroth.Token
 end
