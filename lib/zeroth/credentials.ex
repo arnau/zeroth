@@ -1,9 +1,9 @@
 defmodule Zeroth.Credentials do
   @moduledoc """
-  Client credentials. If you come from `Zeroth.Client` you might be interested
-  in `Zeroth.Token` as well.
+  Client credentials. If you come from `Zeroth.HTTPClient` you might be
+  interested in `Zeroth.Token` as well.
 
-  If you use environment variables you can use `Zeroth.Client.from_env/0`
+  If you use environment variables you can use `Zeroth.HTTPClient.from_env/0`
   which takes care of everything.
 
   If you want to manage it by yourself, the simplest way is using
@@ -13,7 +13,7 @@ defmodule Zeroth.Credentials do
                              client_secret: "y",
                              host: URI.parse("https://foo.auth0.com")])
 
-  And then pass that to `Zeroth.Client.from_credentials/1`.
+  And then pass that to `Zeroth.HTTPClient.from_credentials/1`.
   """
 
   @enforce_keys [:client_id, :client_secret, :audience]

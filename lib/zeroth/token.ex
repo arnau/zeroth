@@ -16,7 +16,7 @@ defmodule Zeroth.Token do
   @doc """
     Fetches a new token from the API.
 
-        client = Zeroth.Client.new(domain, credentials)
+        client = Zeroth.HTTPClient.new(domain, credentials)
         fetch(client)
   """
   @spec fetch(Api.t, String.t) :: Result.t(any, Token.t)

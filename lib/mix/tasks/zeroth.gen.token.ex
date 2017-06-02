@@ -16,7 +16,7 @@ defmodule Mix.Tasks.Zeroth.Gen.Token do
 
   use Mix.Task
 
-  alias Zeroth.Client
+  alias Zeroth.HTTPClient
   alias Zeroth.Credentials
   alias Zeroth.Token
   alias Lonely.Result
@@ -29,7 +29,7 @@ defmodule Mix.Tasks.Zeroth.Gen.Token do
                                     host: :string]])
     |> validate_input()
     |> Result.flat_map(&validate_options/1)
-    |> Result.flat_map(&Client.from_list/1)
+    |> Result.flat_map(&HTTPClient.from_list/1)
     |> Result.flat_map(&fetch/1)
     |> Result.map(fn %{token: token} -> Mix.shell.info([:green, token]) end)
     |> Result.map_error(fn

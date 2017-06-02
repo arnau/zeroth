@@ -1,14 +1,14 @@
-defmodule Zeroth.Client do
+defmodule Zeroth.HTTPClient do
   @moduledoc """
   An agent able to interact with the API.
 
   The fastest way to create a client is to set the environment variables
   `AUTH0_HOST`, `AUTH0_CLIENT_ID` and `AUTH0_CLIENT_SECRET` and use
-  `Client.from_env/0`. If you prefer composing it yourself, check
-  `Client.from_credentials/1` out.
+  `HTTPClient.from_env/0`. If you prefer composing it yourself, check
+  `HTTPClient.from_credentials/1` out.
   """
 
-  alias Zeroth.Client
+  alias Zeroth.HTTPClient
   alias Zeroth.Credentials
   alias Zeroth.Token
   alias Lonely.Result
@@ -18,37 +18,37 @@ defmodule Zeroth.Client do
              :credentials,
              :connection]
   @type credentials :: Credentials.t | Token.t
-  @type t :: %Client{endpoint: URI.t,
-                     credentials: Credentials.t | Token.t,
-                     connection: String.t | nil}
+  @type t :: %__MODULE__{endpoint: URI.t,
+                         credentials: Credentials.t | Token.t,
+                         connection: String.t | nil}
 
   @doc """
-  Composes a basic `%Client{}` from `%Credentials{}`.
+  Composes a basic `%HTTPClient{}` from `%Credentials{}`.
 
-      iex> alias Zeroth.Client
+      iex> alias Zeroth.HTTPClient
       ...> alias Zeroth.Credentials
       ...> {:ok, creds} = Credentials.from_list([client_id: "x",
       ...>                                       client_secret: "y",
       ...>                                       host: URI.parse("https://foo.auth0.com")])
-      ...> Client.from_credentials(creds)
-      {:ok, %Zeroth.Client{endpoint: %URI{authority: "foo.auth0.com",
-                                          host: "foo.auth0.com",
-                                          path: "/",
-                                          port: 443,
-                                          scheme: "https"},
-                           credentials: %Zeroth.Credentials{audience: %URI{authority: "foo.auth0.com",
-                                                                           host: "foo.auth0.com",
-                                                                           path: "/api/v2/",
-                                                                           port: 443,
-                                                                           scheme: "https"},
-                                                            client_id: "x",
-                                                            client_secret: "y",
-                                                            grant_type: "client_credentials"}}}
+      ...> HTTPClient.from_credentials(creds)
+      {:ok, %Zeroth.HTTPClient{endpoint: %URI{authority: "foo.auth0.com",
+                                              host: "foo.auth0.com",
+                                              path: "/",
+                                              port: 443,
+                                              scheme: "https"},
+                               credentials: %Zeroth.Credentials{audience: %URI{authority: "foo.auth0.com",
+                                                                               host: "foo.auth0.com",
+                                                                               path: "/api/v2/",
+                                                                               port: 443,
+                                                                               scheme: "https"},
+                                                                client_id: "x",
+                                                                client_secret: "y",
+                                                                grant_type: "client_credentials"}}}
   """
   @spec from_credentials(Credentials.t) :: Result.t(String.t, t)
   def from_credentials(credentials) do
-    {:ok, %Zeroth.Client{endpoint: URI.merge(credentials.audience, "/"),
-                         credentials: credentials}}
+    {:ok, %Zeroth.HTTPClient{endpoint: URI.merge(credentials.audience, "/"),
+                             credentials: credentials}}
   rescue
     _ -> {:error, "The audience must be an absolute URI: https://example.auth0.com"}
   end
@@ -74,7 +74,7 @@ defmodule Zeroth.Client do
   end
 end
 
-defimpl Zeroth.Api, for: Zeroth.Client do
+defimpl Zeroth.Api, for: Zeroth.HTTPClient do
   alias Lonely.Result
 
   def get(client) do
