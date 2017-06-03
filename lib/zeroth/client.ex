@@ -170,4 +170,19 @@ defmodule Zeroth.Client do
     |> Api.update_endpoint(path)
     |> Api.delete(headers: Token.http_header(api_client.credentials))
   end
+
+  @doc """
+  https://auth0.com/docs/api/management/v2#!/Clients/post_rotate_secret
+  """
+  @spec rotate_secret(String.t, Api.t) :: Result.t(any, t)
+  def rotate_secret(id, api_client) do
+    path = @path
+           |> URIE.merge_path(id)
+           |> URIE.merge_path("rotate-secret")
+
+    api_client
+    |> Api.update_endpoint(path)
+    |> Api.post(%{}, headers: Token.http_header(api_client.credentials),
+                     as: %__MODULE__{})
+  end
 end
