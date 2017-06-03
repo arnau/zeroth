@@ -56,4 +56,22 @@ defmodule Zeroth.Param do
   """
   def mapper({:fields, xs}), do: {:fields, Enum.join(xs, ",")}
   def mapper(param), do: param
+
+  @doc """
+  Cleans a struct from nil to prepare it to be serialised to JSON.
+
+      iex> alias Zeroth.Client
+      ...> alias Zeroth.Param
+      ...> %Client{name: "Foo"} |> Param.from_struct()
+      %{name: "Foo"}
+  """
+  def from_struct(struct) do
+    struct
+    |> Map.from_struct()
+    |> Map.to_list()
+    |> Enum.reduce(%{}, &from_struct_reducer/2)
+  end
+
+  defp from_struct_reducer({_, v}, acc) when is_nil(v), do: acc
+  defp from_struct_reducer({k, v}, acc), do: Map.put(acc, k, v)
 end

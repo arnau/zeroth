@@ -115,7 +115,8 @@ defimpl Zeroth.Api, for: Zeroth.HTTPClient do
     |> Result.flat_map(&parse_response(&1, options))
   end
 
-  def parse_response(%{status_code: 200, body: body}, options) do
+  def parse_response(%{status_code: code, body: body}, options)
+    when code in [200, 201] do
     Poison.decode(body, options)
   end
 

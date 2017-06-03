@@ -130,4 +130,19 @@ defmodule Zeroth.Client do
     |> Api.get(headers: Token.http_header(api_client.credentials),
                as: %__MODULE__{})
   end
+
+  @doc """
+  https://auth0.com/docs/api/management/v2#!/Clients/post_clients
+  """
+  @spec create(map, Api.t, list) :: Result.t(any, t)
+  def create(body = %__MODULE__{}, api_client) do
+    body = Param.from_struct(body)
+    body[:name] || {:error, "You must specify a name for a new Client."}
+
+    api_client
+    |> Api.update_endpoint(@path)
+    |> Api.post(body),
+                headers: Token.http_header(api_client.credentials),
+                as: %__MODULE__{})
+  end
 end
