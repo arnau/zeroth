@@ -158,4 +158,16 @@ defmodule Zeroth.Client do
     |> Api.patch(body, headers: Token.http_header(api_client.credentials),
                        as: %__MODULE__{})
   end
+
+  @doc """
+  https://auth0.com/docs/api/management/v2#!/Clients/delete_clients_by_id
+  """
+  @spec delete(String.t, Api.t) :: Result.t(any, atom)
+  def delete(id, api_client) do
+    path = URIE.merge_path(@path, id)
+
+    api_client
+    |> Api.update_endpoint(path)
+    |> Api.delete(headers: Token.http_header(api_client.credentials))
+  end
 end

@@ -17,7 +17,6 @@ defmodule Mix.Tasks.Zeroth.Gen.Token do
   use Mix.Task
 
   alias Zeroth.HTTPClient
-  alias Zeroth.Credentials
   alias Zeroth.Token
   alias Lonely.Result
 

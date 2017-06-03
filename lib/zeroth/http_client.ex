@@ -126,6 +126,16 @@ defimpl Zeroth.Api, for: Zeroth.HTTPClient do
     |> Result.flat_map(&parse_response(&1, options))
   end
 
+  def delete(client, options \\ []) do
+    headers = Keyword.get(options, :headers)
+
+    client.endpoint
+    |> HTTPoison.delete(Option.with_default(headers, %{}))
+    |> Result.flat_map(&parse_response/1)
+  end
+
+  def parse_response(%{status_code: 204}), do: {:ok, :deleted}
+
   def parse_response(%{status_code: code, body: body}, options)
     when code in [200, 201] do
     Poison.decode(body, options)
