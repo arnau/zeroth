@@ -5,7 +5,9 @@ defmodule Zeroth.Client do
 
   alias Zeroth.Api
   alias Zeroth.Token
+  alias Zeroth.Param
   alias Lonely.Result
+  alias URI.Ext, as: URIE
 
   @path URI.parse("/api/v2/clients")
 
@@ -67,20 +69,23 @@ defmodule Zeroth.Client do
                          is_first_party: boolean,
                          is_token_endpoint_ip_header_trusted: boolean,
                          logo_uri: String.t | nil,
-                         mobile: %{android: %{app_package_name: String.t,
-                                              sha256_cert_fingerprints: [String.t]} | nil,
-                                   ios: %{team_id: String.t,
-                                          app_bundle_identifier: String.t} | nil},
+                         mobile:
+                           %{android:
+                             %{app_package_name: String.t,
+                               sha256_cert_fingerprints: [String.t]} | nil,
+                             ios: %{team_id: String.t,
+                                    app_bundle_identifier: String.t} | nil},
                          name: String.t,
                          oidc_conformant: boolean | nil,
                          owners: [String.t] | nil,
                          sso: boolean,
                          sso_disabled: boolean,
                          token_endpoint_auth_method: String.t | nil,
-                         jwt_configuration:  %{lifetime_in_seconds: non_neg_integer,
-                                               secret_encoded: boolean | nil,
-                                                scopes: map | nil,
-                                                alg: String.t | nil} | nil,
+                         jwt_configuration:
+                           %{lifetime_in_seconds: non_neg_integer,
+                           secret_encoded: boolean | nil,
+                           scopes: map | nil,
+                           alg: String.t | nil} | nil,
                          signing_keys: [%{cert: String.t,
                                           pkcs7: String.t,
                                           subject: String.t}],
@@ -89,12 +94,40 @@ defmodule Zeroth.Client do
   @doc """
   https://auth0.com/docs/api/management/v2#!/Clients/get_clients
   """
-  @spec all(Api.t, list) :: [t]
+  @spec all(Api.t, list) :: Result.t(any, [t])
   def all(api_client, options \\ []) do
-    path = URI.Ext.merge_query(@path, options[:query])
+    path = URIE.merge_query(@path, options[:query])
 
     api_client
     |> Api.update_endpoint(path)
-    |> Api.get(headers: Token.http_header(api_client.credentials), as: [%__MODULE__{}])
+    |> Api.get(headers: Token.http_header(api_client.credentials),
+               as: [%__MODULE__{}])
+  end
+
+  @doc """
+  https://auth0.com/docs/api/management/v2#!/Clients/get_clients_by_id
+
+  ## Options
+
+  * `fields`: List of fields to include or exclude from the result.
+  * `include_fields`: If the fields specified are to be included in the result.
+
+  ## Examples
+
+      Client.get("foo", api_client)
+      Client.get("foo", api_client, fields: ["name", "callbacks"])
+      Client.get("foo", api_client, fields: ["name"], include_fields: false)
+  """
+  @spec get(String.t, Api.t, list) :: Result.t(any, t)
+  def get(id, api_client, options \\ []) when is_binary(id) do
+    query = Param.take(options, [:fields, :include_fields])
+    path = @path
+           |> URIE.merge_path(id)
+           |> URIE.merge_query(query)
+
+    api_client
+    |> Api.update_endpoint(path)
+    |> Api.get(headers: Token.http_header(api_client.credentials),
+               as: %__MODULE__{})
   end
 end

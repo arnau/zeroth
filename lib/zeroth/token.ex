@@ -16,16 +16,16 @@ defmodule Zeroth.Token do
   @doc """
     Fetches a new token from the API.
 
-        client = Zeroth.HTTPClient.new(domain, credentials)
-        fetch(client)
+        api_client = Zeroth.HTTPClient.new(domain, credentials)
+        fetch(api_client)
   """
   @spec fetch(Api.t, String.t) :: Result.t(any, Token.t)
-  def fetch(client, path \\ "oauth/token") do
-    body = client.credentials
+  def fetch(api_client, path \\ "oauth/token") do
+    body = api_client.credentials
            |> Map.from_struct()
-           |> Map.put(:audience, to_string(client.credentials.audience))
+           |> Map.put(:audience, to_string(api_client.credentials.audience))
 
-    client
+    api_client
     |> Api.update_endpoint(path)
     |> Api.post(body)
     |> Result.map(&decode/1)

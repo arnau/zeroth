@@ -5,4 +5,5 @@ defmodule ZerothTest do
   doctest Zeroth.HTTPClient
   doctest Zeroth.Credentials
   doctest Zeroth.Token
+  doctest Zeroth.Param
 end
