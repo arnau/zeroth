@@ -31,6 +31,16 @@ defmodule Zeroth.Token do
     |> Result.map(&decode/1)
   end
 
+  @doc """
+      iex> alias Zeroth.Token
+      ...> Token.http_header(%Token{token: "x", expiration_time: 1, type: "Bearer"})
+      %{"Authorization" => "Bearer x"}
+  """
+  @spec http_header(t) :: map
+  def http_header(%__MODULE__{token: token, type: type}) do
+    %{"Authorization" => "#{type} #{token}"}
+  end
+
   @spec decode(map) :: Token.t
   defp decode(%{"access_token" => token,
                 "scope" => scope,

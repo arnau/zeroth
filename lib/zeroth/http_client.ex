@@ -72,29 +72,54 @@ defmodule Zeroth.HTTPClient do
     |> Credentials.from_list()
     |> Result.flat_map(&from_credentials/1)
   end
+
+  @doc """
+  Use the given token as the client credentials.
+
+      iex> alias Zeroth.HTTPClient
+      ...> alias Zeroth.Token
+      ...> {:ok, client} = HTTPClient.from_list(host: "https://foo.auth0.com",
+      ...>                                      client_id: "x",
+      ...>                                      client_secret: "y")
+      ...> token = %Token{token: "x", scope: [], expiration_time: 1}
+      ...> %{credentials: creds} = HTTPClient.with_token(client, token)
+      ...> creds == token
+      true
+  """
+  @spec with_token(t, Token.t) :: t
+  def with_token(%HTTPClient{} = client, %Token{} = token) do
+    %{client | credentials: token}
+  end
 end
 
 defimpl Zeroth.Api, for: Zeroth.HTTPClient do
   alias Lonely.Result
+  alias Lonely.Option
 
-  def get(client) do
-    client
+  def get(client, options \\ []) do
+    {headers, options} = Keyword.pop(options, :headers)
+
+    client.endpoint
+    |> HTTPoison.get(Option.with_default(headers, %{}))
+    |> Result.flat_map(&parse_response(&1, options))
   end
 
-  def post(client, body, headers \\ %{}) do
+  def post(client, body, options \\ []) do
+    {headers, options} = Keyword.pop(options, :headers)
+
     client.endpoint
     |> HTTPoison.post(Poison.encode!(body),
                       %{"Content-Type" => "application/json"}
-                      |> Map.merge(headers)
+                      |> Map.merge(Option.with_default(headers, %{}))
                       |> Map.to_list())
-    |> Result.flat_map(&parse_response/1)
+    |> Result.flat_map(&parse_response(&1, options))
   end
 
-  def parse_response(%{status_code: 200, body: body}) do
-    Poison.decode(body)
+  def parse_response(%{status_code: 200, body: body}, options) do
+    Poison.decode(body, options)
   end
 
-  def parse_response(response) do
+  def parse_response(response, _) do
     response.body
     |> Poison.decode(keys: :atoms)
     |> Result.map(&Map.put(&1, :status_code, response.status_code))
