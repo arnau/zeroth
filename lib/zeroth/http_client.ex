@@ -87,7 +87,7 @@ defmodule Zeroth.HTTPClient do
       true
   """
   @spec with_token(t, Token.t) :: t
-  def with_token(%HTTPClient{} = client, %Token{} = token) do
+  def with_token(client = %HTTPClient{}, token = %Token{}) do
     %{client | credentials: token}
   end
 end

@@ -20,6 +20,11 @@ defmodule Zeroth.Mixfile do
      # Docs
      name: "Zeroth",
      source_url: "https://github.com/arnau/zeroth",
+     test_coverage: [tool: ExCoveralls],
+     preferred_cli_env: ["coveralls": :test,
+                         "coveralls.detail": :test,
+                         "coveralls.post": :test,
+                         "coveralls.html": :test],
      docs: [main: "Zeroth",
             extras: ["README.md"]]]
   end
@@ -31,6 +36,7 @@ defmodule Zeroth.Mixfile do
   defp deps do
     [{:credo, "~> 0.8", only: [:dev, :test], runtime: false},
      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
+     {:excoveralls, "~> 0.6", only: :test},
      {:ex_doc, "~> 0.14", only: [:dev], runtime: false},
      {:httpoison, "~> 0.11"},
      {:poison, "~> 3.1"},
