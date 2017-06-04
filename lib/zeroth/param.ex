@@ -40,9 +40,14 @@ defmodule Zeroth.Param do
       iex> Zeroth.Param.filter({:fields, ["name"]})
       true
   """
-  def filter({:include_fields, value}) when is_boolean(value), do: true
+  def filter({:q, value}), do: true
+  def filter({:page, value}) when is_integer(value), do: true
+  def filter({:per_page, value}) when is_integer(value), do: true
+  def filter({:sort, value}) when is_binary(value), do: true
   def filter({:fields, []}), do: false
   def filter({:fields, value}) when is_list(value), do: true
+  def filter({:include_fields, value}) when is_boolean(value), do: true
+  def filter({:include_totals, value}) when is_boolean(value), do: true
   def filter({_, _}), do: false
 
   @doc """

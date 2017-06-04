@@ -40,7 +40,7 @@ defmodule Zeroth.Mixfile do
      {:ex_doc, "~> 0.14", only: [:dev], runtime: false},
      {:httpoison, "~> 0.11"},
      {:poison, "~> 3.1"},
-     {:lonely, "~> 0.2"}]
+     {:lonely, "~> 0.3"}]
   end
 
   defp aliases do

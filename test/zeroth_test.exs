@@ -1,5 +1,6 @@
 defmodule ZerothTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
+
   doctest URI.Ext
   doctest Zeroth
   doctest Zeroth.HTTPClient

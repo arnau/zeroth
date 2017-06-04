@@ -11,6 +11,7 @@ defmodule Zeroth.Client do
 
   @path URI.parse("/api/v2/clients")
 
+  @derive [Poison.Encoder, Poison.Decoder]
   defstruct [:allowed_clients,
              :allowed_origins,
              :allowed_logout_urls,
