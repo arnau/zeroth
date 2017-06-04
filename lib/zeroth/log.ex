@@ -88,6 +88,19 @@ defmodule Zeroth.Log do
     |> Api.get(headers: Token.http_header(api_client.credentials),
                as: [%__MODULE__{}])
   end
+
+  @doc """
+  https://auth0.com/docs/api/management/v2#!/Logs/get_logs_by_id
+  """
+  @spec get(String.t, Api.t) :: Result.t(any, t)
+  def get(id, api_client) when is_binary(id) do
+    path = URIE.merge_path(@path, id)
+
+    api_client
+    |> Api.update_endpoint(path)
+    |> Api.get(headers: Token.http_header(api_client.credentials),
+               as: %__MODULE__{})
+  end
 end
 
 defimpl Poison.Decoder, for: Zeroth.Log do
