@@ -1,19 +1,52 @@
 # Zeroth
 
-**TODO: Add description**
+Zeroth is a tool to interact with Auth0's Management API.
+
+## Features
+
+* [ ] Client Grants.
+* [x] [Clients](lib/zeroth/client.ex).
+* [ ] Connections.
+* [ ] Device Credentials.
+* [ ] Grants.
+* [x] [Logs](lib/zeroth/log.ex).
+* [ ] Resource Servers.
+* [ ] Rules.
+* [ ] User Blocks.
+* [ ] Users.
+* [ ] Blacklists.
+* [ ] Emails.
+* [ ] Guardian.
+* [ ] Jobs.
+* [ ] Stats.
+* [ ] Tenants.
+* [ ] Admin.
+* [ ] Tickets.
+
+Although the intended usage is via `iex` to have a flexible environment to
+interact with, there is the aim to provide a few `mix` tasks to surface
+common tasks.
+
+### Mix tasks
+
+* `zeroth.gen.token` Generates a token to use with other commands.
+* `zeroth.logs` Lists recent logs.
+
+## Documentation
+
+For now, read it in the source code or fire up `iex -S mix` and `h Zeroth`.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `zeroth` to your list of dependencies in `mix.exs`:
+Currently, there is no stable release. Use it at your own risk.
 
 ```elixir
 def deps do
-  [{:zeroth, "~> 0.1.0"}]
+  [{:zeroth, git: "https://github.com/arnau/zeroth.git"}]
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/zeroth](https://hexdocs.pm/zeroth).
+## License
 
+Zeroth is distributed under the terms of the MIT License. See
+[LICENSE](LICENSE) for details.
