@@ -16,6 +16,8 @@ defmodule Zeroth.Credentials do
   And then pass that to `Zeroth.HTTPClient.from_credentials/1`.
   """
 
+  alias Lonely.Result
+
   @enforce_keys [:client_id, :client_secret, :audience]
   @derive [Poison.Encoder]
   defstruct [client_id: nil,
@@ -48,10 +50,28 @@ defmodule Zeroth.Credentials do
   """
   @spec from_list(list) :: Result.t(String.t, t)
   def from_list(xs) when is_list(xs) do
+    xs
+    |> validate()
+    |> Result.flat_map(&new/1)
+  end
+
+  def new(xs) when is_list(xs) do
     {:ok, %__MODULE__{client_id: Keyword.get(xs, :client_id),
                       client_secret: Keyword.get(xs, :client_secret),
                       audience: URI.merge(Keyword.get(xs, :host), "/api/v2/")}}
   rescue
     _ -> {:error, "The host must be an absolute URI: https://example.auth0.com"}
+  end
+
+  @doc false
+  @spec validate(list) :: Result.t(String.t, list)
+  def validate(xs) do
+    config = Keyword.take(xs, [:host, :client_id, :client_secret])
+
+    if Enum.any?(config, fn {_, v} -> is_nil(v) end) do
+      {:error, "Missing some environment variables. Your input: #{inspect(config)}"}
+    else
+      {:ok, xs}
+    end
   end
 end

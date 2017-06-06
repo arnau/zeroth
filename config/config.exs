@@ -1,8 +1,9 @@
 use Mix.Config
 
-config(:zeroth, [host: URI.parse(System.get_env("AUTH0_HOST")),
+config(:zeroth, [host: System.get_env("AUTH0_HOST"),
                  client_id: System.get_env("AUTH0_CLIENT_ID"),
                  client_secret: System.get_env("AUTH0_CLIENT_SECRET")])
+
 
 # And access this configuration in your application as:
 #
