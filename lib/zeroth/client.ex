@@ -97,7 +97,12 @@ defmodule Zeroth.Client do
   """
   @spec all(Api.t, list) :: Result.t(any, [t])
   def all(api_client, options \\ []) do
-    path = URIE.merge_query(@path, options[:query])
+    query = Param.take(options, [:per_page,
+                                 :page,
+                                 :include_totals,
+                                 :fields,
+                                 :include_fields])
+    path = URIE.merge_query(@path, query)
 
     api_client
     |> Api.update_endpoint(path)

@@ -2,6 +2,7 @@ alias Zeroth.HTTPClient
 alias Zeroth.Token
 alias Zeroth.Client
 alias Zeroth.Log
+alias Zeroth.User
 alias Lonely.Result
 
 
