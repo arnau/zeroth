@@ -1,6 +1,12 @@
 defmodule Zeroth.User do
   @moduledoc """
   Auth0 User management. https://auth0.com/docs/api/management/v2#!/Users
+
+  Pending to implement:
+
+  * [Delete a user's multifactor provider](https://auth0.com/docs/api/management/v2#!/Users/delete_multifactor_by_provider)
+  * [Unlink a user identity](https://auth0.com/docs/api/management/v2#!/Users/delete_provider_by_user_id)
+  * [Generate new Guardian recovery code](https://auth0.com/docs/api/management/v2#!/Users/post_recovery_code_regeneration)
   """
 
   alias Zeroth.Api
@@ -226,5 +232,25 @@ defmodule Zeroth.User do
     |> Api.update_endpoint(path)
     |> Api.get(headers: Token.http_header(api_client.credentials),
                as: [%Zeroth.Log{}])
+  end
+
+  @doc """
+  https://auth0.com/docs/api/management/v2#!/Users/post_identities
+
+  **Note**: The `link_with` way is not supported.
+
+  ## Examples
+
+      User.link("auth0|59383521b3c34a15589c5577",
+                %{provider: "twitter", user_id: "1111111"},
+                api_client)
+  """
+  @spec link(String.t, map, Api.t) :: Result.t(any, map)
+  def link(id, body, api_client) when is_map(body) do
+    path = URIE.merge_path(@path, id)
+
+    api_client
+    |> Api.update_endpoint(path)
+    |> Api.patch(body, headers: Token.http_header(api_client.credentials))
   end
 end
