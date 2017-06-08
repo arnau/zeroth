@@ -27,7 +27,7 @@ defmodule Zeroth.Token do
 
     api_client
     |> Api.update_endpoint(path)
-    |> Api.post(body)
+    |> Api.post(body, [])
     |> Result.map(&decode/1)
   end
 

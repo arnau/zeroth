@@ -1,12 +1,6 @@
 defmodule Zeroth.User do
   @moduledoc """
   Auth0 User management. https://auth0.com/docs/api/management/v2#!/Users
-
-  Pending to implement:
-
-  * [Delete a user's multifactor provider](https://auth0.com/docs/api/management/v2#!/Users/delete_multifactor_by_provider)
-  * [Unlink a user identity](https://auth0.com/docs/api/management/v2#!/Users/delete_provider_by_user_id)
-  * [Generate new Guardian recovery code](https://auth0.com/docs/api/management/v2#!/Users/post_recovery_code_regeneration)
   """
 
   alias Zeroth.Api
@@ -245,12 +239,60 @@ defmodule Zeroth.User do
                 %{provider: "twitter", user_id: "1111111"},
                 api_client)
   """
-  @spec link(String.t, map, Api.t) :: Result.t(any, map)
+  @spec link(String.t, map, Api.t) :: Result.t(any, list)
   def link(id, body, api_client) when is_map(body) do
-    path = URIE.merge_path(@path, id)
+    path = URIE.merge_path(@path, "#{id}/identities")
 
     api_client
     |> Api.update_endpoint(path)
-    |> Api.patch(body, headers: Token.http_header(api_client.credentials))
+    |> Api.post(body, headers: Token.http_header(api_client.credentials))
+  end
+
+  @doc """
+  https://auth0.com/docs/api/management/v2#!/Users/delete_provider_by_user_id
+
+  ## Examples
+
+      User.unlink("auth0|59383521b3c34a15589c5577",
+                  %{provider: "twitter", user_id: "1111111"},
+                  api_client)
+  """
+  @spec unlink(String.t, map, Api.t) :: Result.t(any, list)
+  def unlink(id, %{provider: provider, client_id: snd_id}, api_client) do
+    path = URIE.merge_path(@path, "#{id}/identities/#{provider}/#{snd_id}")
+
+    api_client
+    |> Api.update_endpoint(path)
+    |> Api.delete(headers: Token.http_header(api_client.credentials))
+  end
+
+  @doc """
+  https://auth0.com/docs/api/management/v2#!/Users/delete_multifactor_by_provider)
+
+  ## Examples
+
+      User.delete_multifactor("auth0|59383521b3c34a15589c5577",
+                              "google-authenticator",
+                              api_client)
+  """
+  @spec delete_multifactor(String.t, String.t, Api.t) :: Result.t(any, atom)
+  def delete_multifactor(id, provider, api_client) do
+    path = URIE.merge_path(@path, "#{id}/multifactor/#{provider}")
+
+    api_client
+    |> Api.update_endpoint(path)
+    |> Api.delete(headers: Token.http_header(api_client.credentials))
+  end
+
+  @doc """
+  https://auth0.com/docs/api/management/v2#!/Users/post_recovery_code_regeneration
+  """
+  @spec generate_recovery_code(String.t, Api.t) :: Result.t(any, map)
+  def generate_recovery_code(id, api_client) do
+    path = URIE.merge_path(@path, "#{id}/recovery-code-regeneration")
+
+    api_client
+    |> Api.update_endpoint(path)
+    |> Api.post(headers: Token.http_header(api_client.credentials))
   end
 end

@@ -40,7 +40,7 @@ defmodule Zeroth.Param do
       iex> Zeroth.Param.filter({:fields, ["name"]})
       true
   """
-  def filter({:q, value}), do: true
+  def filter({:q, value}) when is_binary(value), do: true
   def filter({:page, value}) when is_integer(value), do: true
   def filter({:per_page, value}) when is_integer(value), do: true
   def filter({:sort, value}) when is_binary(value), do: true

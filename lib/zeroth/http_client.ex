@@ -104,7 +104,17 @@ defimpl Zeroth.Api, for: Zeroth.HTTPClient do
     |> Result.flat_map(&parse_response(&1, options))
   end
 
-  def post(client, body, options \\ []) do
+  def post(client, options) do
+    {headers, options} = Keyword.pop(options, :headers)
+
+    client.endpoint
+    |> HTTPoison.post("", %{"Content-Type" => "application/json"}
+                      |> Map.merge(Option.with_default(headers, %{}))
+                      |> Map.to_list())
+    |> Result.flat_map(&parse_response(&1, options))
+  end
+
+  def post(client, body, options) do
     {headers, options} = Keyword.pop(options, :headers)
 
     client.endpoint
@@ -135,6 +145,7 @@ defimpl Zeroth.Api, for: Zeroth.HTTPClient do
   end
 
   def parse_response(%{status_code: 204}), do: {:ok, :deleted}
+  def parse_response(response), do: parse_response(response, [])
 
   def parse_response(%{status_code: code, body: body}, options)
     when code in [200, 201] do

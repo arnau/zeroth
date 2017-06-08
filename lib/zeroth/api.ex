@@ -1,6 +1,7 @@
 defprotocol Zeroth.Api do
   def get(client, options \\ [])
-  def post(client, body, options \\ [])
+  def post(client, body, options)
+  def post(client, options)
   def patch(client, body, options \\ [])
   def delete(client, options \\ [])
 
