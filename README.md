@@ -2,6 +2,9 @@
 
 Zeroth is a tool to interact with Auth0's Management API.
 
+[![CircleCI](https://circleci.com/gh/arnau/zeroth.svg?style=svg)](https://circleci.com/gh/arnau/zeroth)
+
+
 ## Features
 
 * [ ] Client Grants.
