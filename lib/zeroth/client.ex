@@ -94,12 +94,13 @@ defmodule Zeroth.Client do
 
   @doc """
   https://auth0.com/docs/api/management/v2#!/Clients/get_clients
+
+  **Note**: `include_totals` is not supported.
   """
   @spec all(Api.t, list) :: Result.t(any, [t])
   def all(api_client, options \\ []) do
     query = Param.take(options, [:per_page,
                                  :page,
-                                 :include_totals,
                                  :fields,
                                  :include_fields])
     path = URIE.merge_query(@path, query)

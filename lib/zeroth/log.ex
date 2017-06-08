@@ -45,6 +45,8 @@ defmodule Zeroth.Log do
   @doc """
   https://auth0.com/docs/api/management/v2#!/Logs/get_logs
 
+  **Note**: `include_totals` is not supported.
+
   ## Options
 
   ### Search by criteria
@@ -55,7 +57,6 @@ defmodule Zeroth.Log do
   * `sort`: The field to use for sorting. Use field:order, where order is `1` for ascending and `-1` for descending. For example `date:-1`.
   * `fields`: A comma separated list of fields to include or exclude (depending on `include_fields`) from the result, empty to retrieve all fields.
   * `include_fields`: true if the fields specified are to be included in the result, false otherwise. Defaults to `true`.
-  * `include_totals`: true if a query summary must be included in the result, false otherwise. Default `false`.
 
   ### Search by checkpoint
 
@@ -78,7 +79,6 @@ defmodule Zeroth.Log do
                                  :sort,
                                  :fields,
                                  :include_fields,
-                                 :include_totals,
                                  :from,
                                  :take])
     path = URIE.merge_query(@path, query)

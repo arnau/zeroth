@@ -57,6 +57,8 @@ defmodule Zeroth.User do
   @doc """
   https://auth0.com/docs/api/management/v2#!/Users/get_users
 
+  **Note**: `include_totals` is not supported.
+
   ## Options
 
   * `q`: Search Criteria using Query String Syntax.
@@ -65,7 +67,6 @@ defmodule Zeroth.User do
   * `sort`: The field to use for sorting. Use field:order, where order is `1` for ascending and `-1` for descending. For example `date:-1`.
   * `fields`: A comma separated list of fields to include or exclude (depending on `include_fields`) from the result, empty to retrieve all fields.
   * `include_fields`: true if the fields specified are to be included in the result, false otherwise. Defaults to `true`.
-  * `include_totals`: true if a query summary must be included in the result, false otherwise. Default `false`.
 
   **Note**: If there is no default `sort` field defined the results may be
   inconsistent. E.g. Duplicate records or users that never logged in not
@@ -81,7 +82,6 @@ defmodule Zeroth.User do
     query = options
             |> Param.take([:per_page,
                            :page,
-                           :include_totals,
                            :sort,
                            :connection,
                            :fields,
@@ -182,7 +182,7 @@ defmodule Zeroth.User do
   @doc """
   https://auth0.com/docs/api/management/v2#!/Users/get_enrollments
   """
-  @spec enrollments(String.t, Api.t) :: Result.t(any, atom)
+  @spec enrollments(String.t, Api.t) :: Result.t(any, list)
   def enrollments(id, api_client) do
     path = URIE.merge_path(@path, "#{id}/enrollments")
 
@@ -190,5 +190,41 @@ defmodule Zeroth.User do
     |> Api.update_endpoint(path)
     |> Api.get(headers: Token.http_header(api_client.credentials),
                as: [%Zeroth.User.Enrollment{}])
+  end
+
+  @doc """
+  https://auth0.com/docs/api/management/v2#!/Users/get_logs_by_user
+
+  **Note**: `include_totals` is not supported.
+
+  ## Sortable fields
+
+  * `date`: The moment when the event occured.
+  * `connection`: The connection related to the event.
+  * `client_id`: The client id related to the event
+  * `client_name`: The name of the client related to the event.
+  * `ip`: The IP address from where the request that caused the log entry originated.
+  * `user_id`: The user id related to the event.
+  * `user_name`: The user name related to the event.
+  * `description`: The description of the event.
+  * `user_agent`: The user agent that is related to the event.
+  * `type`: The event type. Refer to the event acronym mappings above for a list of possible event types.
+  * `details`: The details object of the event.
+  * `strategy`: The connection strategy related to the event.
+  * `strategy_type`: The connection strategy type related to the event.
+  """
+  @spec logs(String.t, Api.t, list) :: Result.t(any, [Zeroth.Log.t])
+  def logs(id, api_client, options \\ []) do
+    query = Param.take(options, [:per_page,
+                                 :page,
+                                 :sort])
+    path = @path
+           |> URIE.merge_path("#{id}/logs")
+           |> URIE.merge_query(query)
+
+    api_client
+    |> Api.update_endpoint(path)
+    |> Api.get(headers: Token.http_header(api_client.credentials),
+               as: [%Zeroth.Log{}])
   end
 end
