@@ -178,4 +178,17 @@ defmodule Zeroth.User do
     |> Api.update_endpoint(path)
     |> Api.delete(headers: Token.http_header(api_client.credentials))
   end
+
+  @doc """
+  https://auth0.com/docs/api/management/v2#!/Users/get_enrollments
+  """
+  @spec enrollments(String.t, Api.t) :: Result.t(any, atom)
+  def enrollments(id, api_client) do
+    path = URIE.merge_path(@path, "#{id}/enrollments")
+
+    api_client
+    |> Api.update_endpoint(path)
+    |> Api.get(headers: Token.http_header(api_client.credentials),
+               as: [%Zeroth.User.Enrollment{}])
+  end
 end
