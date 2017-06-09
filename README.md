@@ -15,7 +15,7 @@ Zeroth is a tool to interact with Auth0's Management API.
 * [x] [Logs](lib/zeroth/log.ex).
 * [ ] Resource Servers.
 * [ ] Rules.
-* [ ] User Blocks.
+* [x] [User Blocks](lib/zeroth/user_block.ex).
 * [x] [Users](lib/zeroth/user.ex).
 * [ ] Blacklists.
 * [ ] Emails.
