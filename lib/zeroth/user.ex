@@ -129,6 +129,15 @@ defmodule Zeroth.User do
   You must provide a valid `connection` name for any new user. You will have
   to check what fields are required for the connection type. For example,
   an Auth0 DB requires `email` and `password`.
+
+  ## Examples
+
+      User.create(%{email: "m.burns@example.org",
+                    password: "foobar",
+                    connection: "Username-Password-Authentication",
+                    verify_email: false,
+                    email_verified: true,
+                    user_metadata: %{name: "Montgomery Burns"}}, api_client)
   """
   @spec create(map, Api.t) :: Result.t(any, t)
   def create(body, api_client) when is_map(body) do
