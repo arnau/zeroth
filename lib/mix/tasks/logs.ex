@@ -32,7 +32,8 @@ defmodule Mix.Tasks.Zeroth.Logs do
       api_client
       |> Log.all()
       |> Result.map(&Scribe.print(&1, style: Scribe.Style.Psql, width: 200,
-                                      data: [{"Date", fn (x) -> DateTime.to_iso8601(x.date) end},
+                                      data: [{"Date", fn (x) ->
+                                              DateTime.to_iso8601(x.date) end},
                                              {"Type", :type},
                                              {"ID", :log_id},
                                              {"IP", :ip},
