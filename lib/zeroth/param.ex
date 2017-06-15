@@ -48,6 +48,7 @@ defmodule Zeroth.Param do
   def filter({:fields, value}) when is_list(value), do: true
   def filter({:include_fields, value}) when is_boolean(value), do: true
   def filter({:include_totals, value}) when is_boolean(value), do: true
+  def filter({:enabled, value}) when is_boolean(value), do: true
   def filter({_, _}), do: false
 
   @doc """

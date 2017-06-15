@@ -4,6 +4,7 @@ alias Zeroth.Client
 alias Zeroth.Log
 alias Zeroth.User
 alias Zeroth.UserBlock
+alias Zeroth.Rule
 alias Lonely.Result
 
 
