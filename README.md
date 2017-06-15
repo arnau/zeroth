@@ -9,7 +9,7 @@ Zeroth is a tool to interact with Auth0's Management API.
 
 * [x] [Client Grants](lib/zeroth/client_grant.ex).
 * [x] [Clients](lib/zeroth/client.ex).
-* [ ] Connections.
+* [x] Connections.
 * [ ] Device Credentials.
 * [ ] Grants.
 * [x] [Logs](lib/zeroth/log.ex).

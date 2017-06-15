@@ -50,6 +50,9 @@ defmodule Zeroth.Param do
   def filter({:include_totals, value}) when is_boolean(value), do: true
   def filter({:enabled, value}) when is_boolean(value), do: true
   def filter({:audience, value}) when is_binary(value), do: true
+  def filter({:strategy, []}), do: false
+  def filter({:strategy, value}) when is_list(value), do: true
+  def filter({:name, value}) when is_binary(value), do: true
   def filter({_, _}), do: false
 
   @doc """

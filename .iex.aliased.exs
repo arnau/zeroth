@@ -1,5 +1,6 @@
 alias Zeroth.Client
 alias Zeroth.ClientGrant
+alias Zeroth.Connection
 alias Zeroth.HTTPClient
 alias Zeroth.Log
 alias Zeroth.Rule

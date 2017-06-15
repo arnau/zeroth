@@ -4,6 +4,7 @@ defmodule ZerothTest do
   doctest URI.Ext
   doctest Zeroth
   doctest Zeroth.HTTPClient
+  doctest Zeroth.Connection
   doctest Zeroth.Credentials
   doctest Zeroth.Token
   doctest Zeroth.Param
