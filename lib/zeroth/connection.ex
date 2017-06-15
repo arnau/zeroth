@@ -7,7 +7,6 @@ defmodule Zeroth.Connection do
   alias Zeroth.Token
   alias Zeroth.Param
   alias Lonely.Result
-  alias Lonely.Option
   alias URI.Ext, as: URIE
 
   @path URI.parse("/api/v2/connections")
